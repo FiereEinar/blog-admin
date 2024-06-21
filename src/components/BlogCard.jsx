@@ -19,7 +19,10 @@ export default function BlogCard({ blog }) {
 				<p className='text-xs italic'>
 					Read time: {determineReadtime(blog.text)} minutes
 				</p>
-				<h4 className='text-xl  text-black'>{blog.title}</h4>
+				<h4
+					dangerouslySetInnerHTML={{ __html: blog.title }}
+					className='text-xl text-black'
+				/>
 				<p className='text-xs italic'>
 					{format(blog.dateAdded, 'MMMM dd, yyyy')}
 				</p>

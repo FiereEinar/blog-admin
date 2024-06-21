@@ -25,6 +25,11 @@ export default function CommentForm({ refetch }) {
 			const result = await postComment(data, blogId);
 
 			if (!result.success) {
+				toast({
+					variant: 'destructive',
+					title: 'Error posting comment',
+					description: 'An error occured while posting your comment',
+				});
 				return setError('root', { message: 'Comment not posted succesfully.' });
 			}
 

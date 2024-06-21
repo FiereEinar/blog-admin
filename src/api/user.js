@@ -25,27 +25,6 @@ export const postSignIn = async (data) => {
   }
 };
 
-export const postSignUp = async (data) => {
-  try {
-    const response = await fetch(
-      `${BASE_URL}/auth/signup`,
-      {
-        mode: 'cors',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    return response;
-  } catch (error) {
-    console.error('Error signing up:', error);
-    throw new Error('Failed to sign up.');
-  }
-};
-
 export const getUserById = async (userId) => {
   try {
     const response = await fetch(

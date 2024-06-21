@@ -1,7 +1,17 @@
-export function InputField({ id, label, type, error, register, ...rest }) {
+export function InputField({
+	id,
+	label,
+	type,
+	error,
+	register,
+	labelClass,
+	...rest
+}) {
 	return (
 		<div className='flex-1 flex flex-col '>
-			<label htmlFor={id}>{label}</label>
+			<label className={labelClass} htmlFor={id}>
+				{label}
+			</label>
 			<input
 				autoComplete='true'
 				{...register}
