@@ -36,7 +36,7 @@ export default function BlogDetailsPage() {
 
 	return (
 		<main className='flex justify-center flex-wrap gap-10'>
-			<BlogInfo blog={blog} />
+			<BlogInfo blog={blog} refetch={refetch} />
 			<CommentSection comments={blog.comments} refetch={refetch} />
 		</main>
 	);

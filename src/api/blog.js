@@ -51,3 +51,18 @@ export const updateBlog = async (blogId, formData) => {
     throw new Error('Failed to update the blog.');
   }
 };
+
+export const deleteBlog = async (blogId) => {
+  try {
+    const { data } = await axios.delete(`${BASE_URL}/blog/${blogId}`, {
+      headers: {
+        Authorization: getTokenFromLocalStorage()
+      }
+    });
+
+    return data;
+  } catch (err) {
+    console.error('Error deleting blog.', err);
+    throw new Error('Failed to deleting the blog.');
+  }
+};
