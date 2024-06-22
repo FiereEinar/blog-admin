@@ -1,4 +1,5 @@
 import { getTokenFromLocalStorage } from "@/utils/localstorage";
+import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BLOG_API_URL;
 const TOKEN = getTokenFromLocalStorage();
@@ -71,5 +72,20 @@ export const deleteComment = async (commentId, blogId) => {
   } catch (error) {
     console.error('Error posting comment:', error);
     throw new Error('Failed to post the comment.');
+  }
+};
+
+export const hideComment = async (formData, commentId, blogId) => {
+  try {
+    const { data } = await axios.put(`${BASE_URL}/blog/${blogId}/comments/${commentId}/hide`, formData, {
+      headers: {
+        Authorization: getTokenFromLocalStorage()
+      }
+    });
+
+    return data;
+  } catch (err) {
+    console.error('Error updating comment:', err);
+    throw new Error('Failed to update the comment.');
   }
 };

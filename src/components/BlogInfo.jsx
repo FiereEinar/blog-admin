@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Button } from './ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import DialogWrapper from './Dialog';
+import DialogWrapper from './DialogWrapper';
 import { useToast } from './ui/use-toast';
 import { deleteBlog } from '@/api/blog';
 

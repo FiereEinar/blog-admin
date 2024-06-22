@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { userCommentSchema } from '@/utils/validations/userSchema';
-import { deleteComment, postEditComment } from '@/api/comment';
+import { deleteComment, hideComment, postEditComment } from '@/api/comment';
 import { useParams } from 'react-router-dom';
 import { useToast } from './ui/use-toast';
 import { getUserIdFromLocalStorage } from '@/utils/localstorage';
+import DialogWrapper from './DialogWrapper';
 
 /**
  * CommentEditForm will handle the form for editing a comment
@@ -55,6 +56,7 @@ function CommentEditForm({
 	text,
 	imgURL,
 	refetch,
+	isHidden,
 	date,
 	commentId,
 	commenterId,
@@ -107,7 +109,12 @@ function CommentEditForm({
 			className='flex flex-col gap-3 text-sm border-t p-3 w-full'
 		>
 			<div className='flex justify-between'>
-				<CommentUserHeader author={author} date={date} imgURL={imgURL} />
+				<CommentUserHeader
+					author={author}
+					date={date}
+					imgURL={imgURL}
+					isHidden={isHidden}
+				/>
 				{isLoggedIn && commenterId === currentUserId && (
 					<CommentControlWrapper>
 						<CommentModeSwitcher
@@ -151,6 +158,7 @@ function CommentInfo({
 	text,
 	imgURL,
 	refetch,
+	isHidden,
 	date,
 	commentId,
 	commenterId,
@@ -163,9 +171,8 @@ function CommentInfo({
 	const { blogId } = useParams();
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onDelete = async (e) => {
+	const onDelete = async () => {
 		try {
-			e.preventDefault();
 			if (editMode) return;
 			setIsLoading(true);
 
@@ -176,7 +183,6 @@ function CommentInfo({
 					variant: 'destructive',
 					description: 'Error deleting comment.',
 				});
-				console.log(result);
 				return;
 			}
 
@@ -185,7 +191,37 @@ function CommentInfo({
 				description: 'Comment deleted successfully!',
 			});
 		} catch (err) {
-			console.error(err);
+			console.error('Error deleting comment.', err);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const hideCommentHandler = async () => {
+		try {
+			setIsLoading(true);
+
+			const result = await hideComment(
+				{ hidden: !isHidden },
+				commentId,
+				blogId
+			);
+
+			if (!result.success) {
+				toast({
+					variant: 'destructive',
+					description: 'Error hiding comment.',
+				});
+				return;
+			}
+
+			console.log(result);
+			refetch();
+			toast({
+				description: 'Comment hidden successfully!',
+			});
+		} catch (err) {
+			console.error('Error updating comment', err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -194,28 +230,60 @@ function CommentInfo({
 	return (
 		<article className='relative flex flex-col gap-3 text-sm border-t p-3 w-full'>
 			<div className='flex justify-between'>
-				<CommentUserHeader author={author} date={date} imgURL={imgURL} />
+				<CommentUserHeader
+					author={author}
+					date={date}
+					imgURL={imgURL}
+					isHidden={isHidden}
+				/>
 
-				{isLoggedIn && commenterId === currentUserId && (
-					<CommentControlWrapper>
-						<CommentModeSwitcher
-							disabled={isLoading}
-							editMode={editMode}
-							setEditMode={setEditMode}
-						/>
-
-						<Button
-							disabled={isLoading}
-							type='button'
-							onClick={onDelete}
-							size='sm'
-							variant='ghost'
-							className='transition-all size-8 rounded-full p-[6px] hover:bg-gray-200 '
-						>
-							<img src='/delete.svg' alt='delete' />
-						</Button>
-					</CommentControlWrapper>
-				)}
+				<CommentControlWrapper>
+					<DialogWrapper
+						onConfirm={hideCommentHandler}
+						title={`${isHidden ? 'Unhide' : 'Hide'} this comment`}
+						description={`Are you sure you want to ${
+							isHidden ? 'unhide' : 'hide'
+						} this comment?`}
+						trigger={
+							<Button
+								disabled={isLoading}
+								size='sm'
+								variant='ghost'
+								className='transition-all size-8 rounded-full p-[6px] hover:bg-gray-200 '
+							>
+								<img
+									src={`/${isHidden ? 'show' : 'unshow'}.svg`}
+									alt='delete'
+								/>
+							</Button>
+						}
+					/>
+					{isLoggedIn && commenterId === currentUserId && (
+						<>
+							<CommentModeSwitcher
+								disabled={isLoading}
+								editMode={editMode}
+								setEditMode={setEditMode}
+							/>
+						</>
+					)}
+					<DialogWrapper
+						onConfirm={onDelete}
+						confirmBtnVariant='destructive'
+						title='Confirm blog deletion'
+						description='Are you sure you want to delete this blog? This action can not be undone.'
+						trigger={
+							<Button
+								disabled={isLoading}
+								size='sm'
+								variant='ghost'
+								className='transition-all size-8 rounded-full p-[6px] hover:bg-gray-200 '
+							>
+								<img src='/delete.svg' alt='delete' />
+							</Button>
+						}
+					/>
+				</CommentControlWrapper>
 			</div>
 			<p>{text}</p>
 		</article>
@@ -228,7 +296,7 @@ function CommentControlWrapper({ children }) {
 	);
 }
 
-function CommentUserHeader({ author, imgURL, date }) {
+function CommentUserHeader({ author, imgURL, date, isHidden }) {
 	return (
 		<div className='flex gap-3'>
 			<img
@@ -237,7 +305,12 @@ function CommentUserHeader({ author, imgURL, date }) {
 				alt='profile'
 			/>
 			<div>
-				<h4 className=' font-medium'>{author}</h4>
+				<h4 className=' font-medium'>
+					{author}
+					<span className='ml-1 text-muted-foreground text-xs'>
+						{isHidden ? 'Hidden' : ''}
+					</span>
+				</h4>
 				<p className=' text-xs italic'>{date}</p>
 			</div>
 		</div>

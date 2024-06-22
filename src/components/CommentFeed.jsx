@@ -3,17 +3,16 @@ import { Comment } from './Comment';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
 export default function CommentFeed({ comments, refetch }) {
-	const commentList = comments.filter((comment) => comment.hidden === false);
-
 	return (
 		<div className='flex flex-col gap-2'>
-			{commentList.length === 0 && (
+			{comments.length === 0 && (
 				<p className='italic text-sm text-muted-foreground'>No comments yet.</p>
 			)}
-			{commentList.map((comment) => (
+			{comments.map((comment) => (
 				<Comment
 					refetch={refetch}
 					commentId={comment._id}
+					isHidden={comment.hidden}
 					commenterId={comment.creator?._id}
 					imgURL={comment.creator?.profile?.imgUrl || undefined}
 					key={comment._id}
