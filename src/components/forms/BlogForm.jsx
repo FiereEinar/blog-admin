@@ -1,4 +1,4 @@
-import { updateBlog } from '@/api/blog';
+import { addBlog, updateBlog } from '@/api/blog';
 import { blogSchema } from '@/utils/validations/blogSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef, useState } from 'react';
@@ -49,26 +49,39 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 			formData.append('published', data.published);
 			if (blogImage) formData.append('blogImage', blogImage);
 
-			const result = await updateBlog(blogId, formData);
+			let result = null;
+
+			switch (mode) {
+				case 'add':
+					result = await addBlog(formData);
+					break;
+				case 'edit':
+					result = await updateBlog(blogId, formData);
+					break;
+				default:
+					throw new Error('Incorrect mode props.');
+			}
 
 			if (!result.success) {
-				setError('root', { message: 'Error updating blog.' });
+				setError('root', { message: 'Error updating/add blog.' });
 				toast({
 					variant: 'destructive',
-					title: 'Error updating blog',
-					description: 'Failed to update blog',
+					title: 'Error updating/adding blog',
+					description: 'Failed to update/add blog',
 				});
 				return;
 			}
 
 			toast({
-				description: 'Blog updated successfully!',
+				description: `Blog ${
+					mode === 'edit' ? 'edited' : 'added'
+				} successfully!`,
 			});
 			refetch();
-			navigate(`/blog/${blogId}`);
+			navigate(mode === 'edit' ? `/blog/${blogId}` : '/blogs');
 		} catch (err) {
-			console.error('Error editing blog.', err);
-			setError('root', { message: 'Error updating blog.' });
+			console.error('Error editing/adding blog.', err);
+			setError('root', { message: 'Error updating/adding blog.' });
 		}
 	};
 
@@ -86,9 +99,9 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 					className='flex justify-center items-center gap-2'
 				>
 					<InputField
-						register={{ ...register('published') }}
+						register={{ ...register('published', { valueAsBoolean: true }) }}
 						type='checkbox'
-						value={mode === 'add' ? true : blog.published}
+						defaultChecked={mode === 'add' ? true : blog.published}
 						id='published'
 						error={errors.published}
 					/>
@@ -102,7 +115,7 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 					type='submit'
 				>
 					<img className='w-5 h-5' src='/check.svg' alt='' />
-					<p>Save changes</p>
+					<p>{mode === 'edit' ? 'Save changes' : 'Add Blog'}</p>
 				</Button>
 			</section>
 
@@ -112,7 +125,7 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 					{/* Blog image section */}
 					<img
 						className='rounded-sm max-w-[28rem]'
-						src={blog.img.url}
+						src={blog ? blog.img.url : '/placeholder.jpg'}
 						alt='blog image'
 					/>
 					<div className='max-w-[28rem]'>
@@ -150,7 +163,8 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 						)}
 						<textarea
 							{...register('title')}
-							defaultValue={blog.title}
+							placeholder='Blog title'
+							defaultValue={blog ? blog.title : ''}
 							className='w-full font-semibold text-2xl text-center border p-2 rounded-md'
 							rows={3}
 							id='title'
@@ -168,7 +182,7 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 							<label htmlFor='topicId'>Topic: </label>
 							<select
 								{...register('topicId')}
-								defaultValue={blog.topic._id}
+								defaultValue={blog ? blog.topic._id : ''}
 								className='border rounded-sm p-1'
 								id='topicId'
 							>
@@ -193,7 +207,7 @@ export default function BlogForm({ mode, blog, topics, refetch }) {
 				<Editor
 					apiKey={import.meta.env.VITE_TINY_MCE_KEY}
 					onInit={(evt, editor) => (textEditorRef.current = editor)}
-					initialValue={blog.text}
+					initialValue={blog ? blog.text : 'Start writing...'}
 					init={editorSettings}
 				/>
 				{errors.root && (

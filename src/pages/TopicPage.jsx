@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 export default function TopicPage() {
 	const { topicId } = useParams();
 	let blogsOfTopic = [];
-	let topicTitle = null;
+	let topicTitle = '';
 
 	// this might seem odd but the topics are already queried in the Navbar when the App is rendered
 	const {
@@ -23,8 +23,9 @@ export default function TopicPage() {
 		queryFn: fetchTopics,
 	});
 
-	if (topicTitle)
+	if (topics) {
 		topicTitle = topics.find((topic) => topic._id === topicId).title;
+	}
 
 	const {
 		data: blogs,

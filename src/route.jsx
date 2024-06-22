@@ -8,6 +8,7 @@ import TopicPage from './pages/TopicPage';
 import App from './App';
 import ProtectedRoute from './components/ProtectedRoute';
 import BlogEditPage from './pages/BlogEditPage';
+import AddBlogPage from './pages/AddBlogPage';
 
 export default function Route() {
 	const route = createBrowserRouter([
@@ -29,6 +30,14 @@ export default function Route() {
 					element: (
 						<ProtectedRoute>
 							<Blogpage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: '/blog/add',
+					element: (
+						<ProtectedRoute>
+							<AddBlogPage />
 						</ProtectedRoute>
 					),
 				},

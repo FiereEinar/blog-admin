@@ -25,6 +25,12 @@ export default function Header() {
 			<div className='flex gap-3'>
 				{isLoggedIn ? (
 					<>
+						<Link to='/blog/add'>
+							<Button variant='ghost' className='md:px-8 flex gap-1' size='sm'>
+								<img className='w-5 h-5' src='/add.svg' alt='' />
+								<span className='sm:flex hidden'>Add Blog</span>
+							</Button>
+						</Link>
 						<Button
 							variant='ghost'
 							className='md:px-8 flex gap-1'
