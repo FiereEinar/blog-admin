@@ -215,7 +215,6 @@ function CommentInfo({
 				return;
 			}
 
-			console.log(result);
 			refetch();
 			toast({
 				description: 'Comment hidden successfully!',

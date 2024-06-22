@@ -1,4 +1,4 @@
-import { fetchTopics } from '@/api/topic';
+import { deleteTopic, fetchTopics } from '@/api/topic';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
@@ -13,6 +13,8 @@ import {
 import { socialLinks } from '@/constants';
 import useLoadingTracker from '@/hooks/useLoadingTracker';
 import { useToast } from './use-toast';
+import { Button } from './button';
+import DialogWrapper from '../DialogWrapper';
 
 export function NavigationWrapper({ title, children }) {
 	return (
@@ -30,7 +32,7 @@ export function NavigationWrapper({ title, children }) {
 export function NavTopics() {
 	const { toast } = useToast();
 
-	const { data, error, isLoading } = useQuery({
+	const { data, error, isLoading, refetch } = useQuery({
 		queryKey: ['topics'],
 		queryFn: fetchTopics,
 	});
@@ -42,6 +44,33 @@ export function NavTopics() {
 				'The server is still waking up from its sleep, this would only take up to 20-30 seconds :)',
 		});
 	});
+
+	const deleteTopicHandler = async (topicId) => {
+		try {
+			const result = await deleteTopic(topicId);
+
+			if (!result.success) {
+				toast({
+					variant: 'destructive',
+					title: 'Failed to delete topic',
+					description: 'An error occured while deleting the topic',
+				});
+				return;
+			}
+
+			refetch();
+			toast({
+				description: 'Topic deleted successfully!',
+			});
+		} catch (err) {
+			console.log('Error deleting topic', err);
+			toast({
+				variant: 'destructive',
+				title: 'Failed to delete topic',
+				description: 'An error occured while deleting the topic',
+			});
+		}
+	};
 
 	return (
 		<NavigationWrapper title='Topics'>
@@ -57,13 +86,33 @@ export function NavTopics() {
 			)}
 			{data &&
 				data.map((topic) => (
-					<Link
-						className={`${navigationMenuTriggerStyle()} !w-64 hover:text-orange-500`}
+					<div
 						key={topic._id}
-						to={`/topic/${topic._id}`}
+						className='relative flex justify-center items-center'
 					>
-						{topic.title}
-					</Link>
+						<Link
+							className={`${navigationMenuTriggerStyle()} !w-64 hover:text-orange-500`}
+							to={`/topic/${topic._id}`}
+						>
+							{topic.title}
+						</Link>
+						<DialogWrapper
+							title='Delete Topic'
+							description='Are you sure you want to delete this topic?'
+							customConfirmBtn='Delete'
+							confirmBtnVariant='destructive'
+							onConfirm={() => deleteTopicHandler(topic._id)}
+							trigger={
+								<Button
+									size='sm'
+									variant='ghost'
+									className='z-50 hover:bg-red-500 absolute right-1'
+								>
+									<img className='w-4 h-4' src='/delete.svg' alt='' />
+								</Button>
+							}
+						/>
+					</div>
 				))}
 		</NavigationWrapper>
 	);

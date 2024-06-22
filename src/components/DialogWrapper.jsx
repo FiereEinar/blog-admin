@@ -18,6 +18,7 @@ export default function DialogWrapper({
 	customConfirmBtn = 'Confirm',
 	confirmBtnVariant,
 	onConfirm,
+	confirmBtnType = 'button',
 }) {
 	return (
 		<Dialog>
@@ -39,9 +40,9 @@ export default function DialogWrapper({
 						</DialogClose>
 						<DialogClose asChild>
 							<Button
-								onClick={onConfirm}
+								{...(confirmBtnType === 'submit' ? {} : { onClick: onConfirm })}
 								size='sm'
-								type='button'
+								type={confirmBtnType}
 								variant={confirmBtnVariant}
 							>
 								{customConfirmBtn}
