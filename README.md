@@ -1,12 +1,16 @@
-# Blog Frontend
+# Blog Admin
 
-A blog interface built with React, Tailwind CSS, Vite, and ShadCN. It connects with my backend blog API, offering a modern and responsive platform for managing and viewing blog content.For learning purposes only.
+A blog admin interface built with React, Tailwind CSS, Vite, TinyMCE, and ShadCN. It connects with my backend blog API and serves as the admin side for the frontend blog, offering a modern and responsive platform for managing blogs, comments, and topics.
 
 ## Features
 
 - Log in/Sign up
-- Blog comment
+- Rich text editor
+- Blog management
+- Blog comment management
 - Account management
+- Topics management
+- Admin authorization
 
 ## Technologies Used
 
@@ -16,9 +20,11 @@ A blog interface built with React, Tailwind CSS, Vite, and ShadCN. It connects w
 - Vite
 - Shadcn
 - Vercel
+- TinyMCE
 
 ## Libraries Used
 
+- [@tinymce/tinymce-react](https://www.tiny.cloud/docs/tinymce/latest/react-cloud/) A rich text editor for writing blog content
 - [react-hook-form](https://www.npmjs.com/package/react-hook-form) Simplifies form states, errors, and validations.
 - [react-router-dom](https://reactrouter.com/en/main) Contains bindings for using React Router in web applications.
 - [zod](https://zod.dev/) Schema validation for forms.
