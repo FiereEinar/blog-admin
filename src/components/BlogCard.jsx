@@ -4,12 +4,17 @@ import { Link } from 'react-router-dom';
 
 export default function BlogCard({ blog }) {
 	return (
-		<article className='transition-all border w-80 rounded-md text-muted-foreground hover:shadow-lg hover:border-gray-300 hover:-translate-y-1'>
+		<article className='relative transition-all border w-80 rounded-md text-muted-foreground hover:shadow-lg hover:border-gray-300 hover:-translate-y-1'>
 			<Link
 				className='w-full h-full p-3 flex flex-col gap-1 justify-between'
 				to={`/blog/${blog._id}`}
 				key={blog._id}
 			>
+				{!blog.published && (
+					<p className='absolute bg-gray-300 rounded-sm p-1 top-3 right-3 text-xs'>
+						Unpublished
+					</p>
+				)}
 				<img
 					className='w-full h-40 object-cover object-center rounded-sm'
 					src={blog.img.url}
